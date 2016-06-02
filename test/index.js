@@ -6,10 +6,10 @@ describe('native extension', function() {
   it('should export a wrapped object', function() {
     var message = new ISO8583.Message(0);
 
-console.log(message.unpack());
-
-    assert.equal(message.pack(), 1);
-    assert.equal(message.unpack(), 2);
+    
+    var packedMessage = message.pack();
+    assert.equal(packedMessage.length, 72);
+    
   });
 
   /*
