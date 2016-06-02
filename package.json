@@ -1,0 +1,48 @@
+{
+  "name": "iso-8583",
+  "version": "0.0.1",
+  "description": "Packing and unpacking ISO 8583 messages",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "nan": "^2.3.5",
+    "bindings": "^1.2.1",
+    "node-gyp": "^1.0.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.5.3"
+  },
+  "gypfile": true,
+  "scripts": {
+    "configure": "node-gyp configure",
+    "build": "node-gyp build",
+    "dev": "node-gyp build && node test.js",
+    "test": "mocha",
+    "install": "node-gyp rebuild",
+    "bump": "npm test && npm version patch && git push && git push --tags && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s-a/iso-8583.git"
+  },
+  "keywords": [
+    "ISO8583"
+  ],
+  "author": "Stephan Ahlf <stephan.ahlf@gmail.com> (https://github.com/s-a)",
+  "license": "MIT",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/s-a/iso-8583/issues"
+  },
+  "homepage": "https://github.com/s-a/iso-8583#readme",
+  "keywords": [
+    "iso",
+    "8583",
+    "native",
+    "iso8583",
+    "pack",
+    "unpack"
+  ]
+}
