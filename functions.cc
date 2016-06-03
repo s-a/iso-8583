@@ -155,6 +155,47 @@ NAN_METHOD(Message::pack) {
 
 NAN_METHOD(Message::unpack) {
   Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
+
+/*
+you must convert your msg from hex format to binary. like this
+
+binMsg[0]=0x02
+binMsg[1]=0x10
+binMsg[2]=0x32
+binMsg[3]=0x3A
+binMsg[4]=0x40
+untel last bites.
+
+and use :
+
+(void)DL_ISO8583_MSG_Unpack(&isoHandler,binMsg,strlen(msg)/2,&isoMsg);
+*/
+
+/*
+    DL_ISO8583_HANDLER isoHandler;
+    DL_ISO8583_MSG     isoMsg;
+    DL_UINT8           packBuf[1000];
+    DL_UINT16          packedSize;
+    char msg[]="0210323A40010A4180103800000000000000000420050805011392120805042004225132072000001000000115604000800411 163011511463331563GBAAASDD ERRR 1300101B54391001000017654350000000000090300000268410000000300000000000000898100009431000000000000000000 000000000000000036000299";
+
+    unsigned short iso_req_size,iso_resp_size;
+    char iso_header[ISOHEADER+1];
+     char iso_req_buf[10000];
+     char iso_resp_buf[10000];
+
+    // get ISO-8583 1993 handler 
+    DL_ISO8583_DEFS_1993_GetHandler(&isoHandler);
+    DL_ISO8583_MSG_Init(NULL,0,&isoMsg);
+
+    // Unpack message
+    DL_ISO8583_MSG_Init(NULL,0,&isoMsg);
+
+    (void)DL_ISO8583_MSG_Unpack(&isoHandler,msg,strlen(msg),&isoMsg);
+    DL_ISO8583_MSG_Dump(stdout,NULL,&isoHandler,&isoMsg);
+    DL_ISO8583_MSG_Free(&isoMsg);
+
+    return 0;
+*/
   obj->value_ += 1;
   info.GetReturnValue().Set(obj->value_);
 }
