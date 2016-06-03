@@ -54,6 +54,7 @@ NAN_MODULE_INIT(Message::Init) {
 
   Nan::SetPrototypeMethod(tpl, "pack", pack);
   Nan::SetPrototypeMethod(tpl, "unpack", unpack);
+  Nan::SetPrototypeMethod(tpl, "test", test);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("Message").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -80,7 +81,7 @@ NAN_METHOD(Message::New) {
 }
 
 v8::Local<v8::Array> stringToHexArray(DL_UINT8 packBuf[1000], DL_UINT16 iNumBytes){
-  char const hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',   'B','C','D','E','F'};
+  char const hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B','C','D','E','F'};
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
   std::string str;
   int idx = 0;
@@ -148,4 +149,20 @@ NAN_METHOD(Message::unpack) {
   Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
   obj->value_ += 1;
   info.GetReturnValue().Set(obj->value_);
+}
+
+
+NAN_METHOD(Message::test) {
+  Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
+
+  v8::Local<v8::Array> result = Nan::New<v8::Array>();
+
+  if (info[0]->IsArray()) {
+      v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
+      for (int i = 0; i < messageFields->Length(); i++) {
+        Nan::Set(result, i, messageFields->Get(i));
+      }
+  }
+
+  info.GetReturnValue().Set(result);
 }
