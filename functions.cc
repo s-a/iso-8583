@@ -79,7 +79,7 @@ NAN_METHOD(Message::New) {
     info.GetReturnValue().Set(cons->NewInstance(argc, argv));
   }
 }
-
+ 
 v8::Local<v8::Array> stringToHexArray(DL_UINT8 packBuf[1000], DL_UINT16 iNumBytes){
   char const hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B','C','D','E','F'};
   v8::Local<v8::Array> result = Nan::New<v8::Array>();
@@ -96,22 +96,6 @@ v8::Local<v8::Array> stringToHexArray(DL_UINT8 packBuf[1000], DL_UINT16 iNumByte
   return result;
 };
  
-const unsigned char * ToCString(const v8::String::Utf8Value& value) {
-  return *value ? (unsigned char)*value : NULL;
-}
-
- unsigned char *get(v8::Local<v8::Value> value, const unsigned char *fallback = "") {
-    if (value->IsString()) {
-        //v8::String::AsciiValue string(value);
-        char *str = (char *) malloc(value->ToString().length() + 1);
-        strcpy(str, *string);
-        return str;
-    }
-    char *str = (char *) malloc(strlen(fallback) + 1);
-    strcpy(str, fallback);
-    return str;
-} 
-
 NAN_METHOD(Message::pack) {
   Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
 
@@ -131,31 +115,21 @@ NAN_METHOD(Message::pack) {
   // initialise ISO message 
   DL_ISO8583_MSG_Init(NULL, 0, &isoMsg);
 
-  // set ISO message fields 
-  /*  
-    (void)DL_ISO8583_MSG_SetField_Str(0,(DL_UINT8 *)"1234",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(2,(DL_UINT8 *)"1234567890123456",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(4,(DL_UINT8 *)"5699",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(11,(DL_UINT8 *)"234",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(39,(DL_UINT8 *)"4",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(41,(DL_UINT8 *)"12345",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(42,(DL_UINT8 *)"678901234",&isoMsg);
-    (void)DL_ISO8583_MSG_SetField_Str(125,(DL_UINT8 *)"BLAH BLAH",&isoMsg);
-  */
+  // set ISO message fields  
   if (info[0]->IsArray()) {
       v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
       for (unsigned int i = 0; i < messageFields->Length(); i++) {
         v8::Handle<v8::Array> messageField = v8::Handle<v8::Array>::Cast(messageFields->Get(i));
-        // object->Get(String::New("a"));
-
-        // convert it to string
-        
+       
         DL_UINT16 messageFieldPosition = (DL_UINT16)messageField->Get(0)->Uint32Value();
-        const v8::String::Utf8Value _messageFieldValue(messageField->Get(1)->ToString());
-        const DL_UINT8 messageFieldValue = (DL_UINT8)ToCString(_messageFieldValue); 
+        
+        // convert it to C string
+        v8::String::Utf8Value _messageFieldValue(messageField->Get(1)->ToString());
+        std::string messageFieldValue = std::string(*_messageFieldValue);
+        const char * c = messageFieldValue.c_str();
 
         //(DL_UINT16 iField, const DL_UINT8 *iDataStr)
-        (void)DL_ISO8583_MSG_SetField_Str( messageFieldPosition, messageFieldValue, &isoMsg);
+        (void)DL_ISO8583_MSG_SetField_Str( messageFieldPosition, (DL_UINT8 *)c, &isoMsg);
       }
   }
 
