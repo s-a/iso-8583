@@ -17,7 +17,7 @@
   "scripts": {
     "configure": "node-gyp configure",
     "build": "node-gyp build",
-    "dev": "node-gyp build && node test.js",
+    "dev": "node-gyp build && npm test",
     "test": "mocha",
     "install": "node-gyp rebuild",
     "bump": "npm test && npm version patch && git push && git push --tags && npm publish"

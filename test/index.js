@@ -6,8 +6,20 @@ describe('native extension', function() {
   it('should export a wrapped object', function() {
     var message = new ISO8583.Message(0);
 
+    var messageFields = [
+      [0, "1234"],
+      [2, "1234567890123456"],
+      [4, "5699"],
+      [11, "234"],
+      [39, "4"],
+      [41, "12345"],
+      [42, "678901234"],
+      [125, "BLAH BLAH"]
+    ];
+
     
-    var packedMessage = message.pack();
+    var packedMessage = message.pack(messageFields);
+    console.log("packedMessage", packedMessage);
     assert.equal(packedMessage.length, 72);
     
   });
