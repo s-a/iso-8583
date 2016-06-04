@@ -42,6 +42,18 @@
     "native",
     "iso8583",
     "pack",
-    "unpack"
+    "unpack",
+    "parse",
+    "standard",
+    "card",
+    "financial",
+    "transactions",
+    "payment",
+    "card originated",
+    "transaction card",
+    "financial",
+    "financial transaction",
+    "transaction card originated",
+    "financial transaction card"
   ]
 }
