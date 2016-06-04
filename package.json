@@ -1,6 +1,6 @@
 {
   "name": "iso-8583",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Packing and unpacking ISO 8583 messages",
   "main": "index.js",
   "directories": {
@@ -27,16 +27,6 @@
     "url": "git+https://github.com/s-a/iso-8583.git"
   },
   "keywords": [
-    "ISO8583"
-  ],
-  "author": "Stephan Ahlf <stephan.ahlf@gmail.com> (https://github.com/s-a)",
-  "license": "MIT",
-  "gypfile": true,
-  "bugs": {
-    "url": "https://github.com/s-a/iso-8583/issues"
-  },
-  "homepage": "https://github.com/s-a/iso-8583#readme",
-  "keywords": [
     "iso",
     "8583",
     "native",
@@ -55,5 +45,11 @@
     "financial transaction",
     "transaction card originated",
     "financial transaction card"
-  ]
+  ],
+  "author": "Stephan Ahlf <stephan.ahlf@gmail.com> (https://github.com/s-a)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/s-a/iso-8583/issues"
+  },
+  "homepage": "https://github.com/s-a/iso-8583#readme"
 }
