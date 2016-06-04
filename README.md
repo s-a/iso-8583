@@ -13,13 +13,13 @@ A native Node module to process ISO 8583 Financial transaction card originated m
 [ISO 8583 Financial transaction card originated messages](https://en.wikipedia.org/wiki/ISO_8583) — Interchange message specifications is the International Organization for Standardization standard for systems that exchange electronic transactions made by cardholders using payment cards. 
 
 ## Background
-***This module is based on the efforts of (Oscar Sanderson)[http://www.oscarsanderson.com].***
+***This module is based on the efforts of [Oscar Sanderson](http://www.oscarsanderson.com).***
 
 > ISO 8583 is a messaging standard used for payment card originated financial transactions. At present there are three different versions of the standard, as follows:
 > 
-> 1987 (used by Visa / MasterCard)
-> 1993 (used by Amex)
-> 2003
+> 1987 (used by Visa / MasterCard)  
+> 1993 (used by Amex)  
+> 2003  
 > Each version is named based on the year that it was published.
 > 
 > Whilst ISO 8583 is an official standard, it is important to note that most implementations are derivatives and do not fully comply with the published standard, however the variations are typically minor and it is generally quite a trivial task to modify an existing ISO 8583 version handler to accommodate such variations.
