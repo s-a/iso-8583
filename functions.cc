@@ -51,7 +51,7 @@ v8::Local<v8::Array> stringToHexArray(DL_UINT8 packBuf[1000], DL_UINT16 iNumByte
 	v8::Local<v8::Array> result = Nan::New<v8::Array>();
 	std::string str;
 	int idx = 0;
-	for (int i = 0; i < iNumBytes; ++i) {
+	for (unsigned int i = 0; i < iNumBytes; ++i) {
 		const char ch = packBuf[i];
 		str = "";
 		str.append(&hex[(ch  & 0xF0) >> 4], 1);
@@ -123,7 +123,7 @@ v8::Local<v8::Array> DL_ISO8583_MSG_Fetch ( FILE                     *iOutFile,
 					       const DL_ISO8583_MSG     *iMsg )
 {
 	DL_UINT16 i;
-	char     *tmpEOL = _iEolStr == NULL ? "\n" : _iEolStr;
+
 
 
 	v8::Local<v8::Array> result = Nan::New<v8::Array>();
@@ -162,7 +162,7 @@ v8::Local<v8::Array> DL_ISO8583_MSG_Fetch ( FILE                     *iOutFile,
 
 
 NAN_METHOD(Message::unpack) {
-	Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
+	//Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
 
 	v8::Local<v8::Object> bufferObj = info[0]->ToObject();
 	unsigned int len = info[1]->Uint32Value();
@@ -189,7 +189,7 @@ NAN_METHOD(Message::unpack) {
 
 
 NAN_METHOD(Message::test) {
-	Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
+	//Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
 
 	v8::Local<v8::Array> result = Nan::New<v8::Array>();
 
