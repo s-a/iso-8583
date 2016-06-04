@@ -9,7 +9,7 @@ NativeExtension.Message.prototype.parse = function(data) {
 	for (var i = 0; i < unpackedMessage.length; i++) {
 		var u = unpackedMessage[i];
 		if (u){
-			result.push([parseInt(u.key, 10), u.value]);
+			result.push([parseInt(u.key, 10), u.value.trim()]);
 		}
 	}
 
