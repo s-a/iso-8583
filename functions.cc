@@ -1,6 +1,6 @@
 #include "functions.h"
 
-#include "iostream"
+
 
 extern "C"{
 		#include "lib/dl_iso8583.h"
@@ -9,44 +9,6 @@ extern "C"{
 }
 
 
-
-
-/*
-NAN_METHOD(nothing) {
-}
-
-NAN_METHOD(aString) {
-		info.GetReturnValue().Set(Nan::New("This is a thing.").ToLocalChecked());
-}
-
-NAN_METHOD(aBoolean) {
-		info.GetReturnValue().Set(false);
-}
-
-NAN_METHOD(aNumber) {
-		info.GetReturnValue().Set(1.75);
-}
-
-NAN_METHOD(anObject) {
-		v8::Local<v8::Object> obj = Nan::New<v8::Object>();
-		Nan::Set(obj, Nan::New("key").ToLocalChecked(), Nan::New("value").ToLocalChecked());
-		info.GetReturnValue().Set(obj);
-}
-
-NAN_METHOD(anArray) {
-		v8::Local<v8::Array> arr = Nan::New<v8::Array>(3);
-		Nan::Set(arr, 0, Nan::New(1));
-		Nan::Set(arr, 1, Nan::New(2));
-		Nan::Set(arr, 2, Nan::New(3));
-
-		info.GetReturnValue().Set(arr);
-}
-
-NAN_METHOD(callback) {
-		v8::Local<v8::Function> callbackHandle = info[0].As<v8::Function>();
-		Nan::MakeCallback(Nan::GetCurrentContext()->Global(), callbackHandle, 0, 0);
-}
-*/
 // Wrapper Impl
 
 Nan::Persistent<v8::Function> Message::constructor;
@@ -175,21 +137,18 @@ v8::Local<v8::Array> DL_ISO8583_MSG_Fetch ( FILE                     *iOutFile,
 
 			if ( NULL != fieldDef ) /* present */
 			{
-
-
 				std::string k = std::to_string(i);
-				std::string v = "v";// std::string(iMsg->field[i].ptr);
 
+				// convert to std::string
+				std::string v = "";
+				const char *buf1 = "";
+				std::string str(buf1);
+				str = (const char *)iMsg->field[i].ptr; // Calls str.operator=(const char *)
 
-				//std::snprintf(iMsg->field[i].ptr,strlen(iMsg->field[i].ptr));
-				//getline(iMsg->field[i].ptr, v);
 				const v8::Local<v8::Object> item = Nan::New<v8::Object>();
 				Nan::Set(item, Nan::New("key").ToLocalChecked(), Nan::New(k).ToLocalChecked());
-				Nan::Set(item, Nan::New("value").ToLocalChecked(), Nan::New(v).ToLocalChecked());
-				/*Nan::Set(item, 0, Nan::New( (int)i ));
-				Nan::Set(item, 1, Nan::New( "a" ));*/
+				Nan::Set(item, Nan::New("value").ToLocalChecked(), Nan::New(str).ToLocalChecked());
 
-				//
 				Nan::Set(result, i, item );
 			}
 
@@ -218,7 +177,7 @@ NAN_METHOD(Message::unpack) {
 
 	(void)DL_ISO8583_MSG_Unpack(&isoHandler, (DL_UINT8 *)msg, len, &isoMsg);
 
-	DL_ISO8583_MSG_Dump(stdout, NULL, &isoHandler, &isoMsg);
+	// DL_ISO8583_MSG_Dump(stdout, NULL, &isoHandler, &isoMsg);
 
 
 	v8::Local<v8::Array> result = DL_ISO8583_MSG_Fetch(stdout, NULL, &isoHandler, &isoMsg);
@@ -243,3 +202,41 @@ NAN_METHOD(Message::test) {
 
 	info.GetReturnValue().Set(result);
 }
+
+
+/*
+NAN_METHOD(nothing) {
+}
+
+NAN_METHOD(aString) {
+		info.GetReturnValue().Set(Nan::New("This is a thing.").ToLocalChecked());
+}
+
+NAN_METHOD(aBoolean) {
+		info.GetReturnValue().Set(false);
+}
+
+NAN_METHOD(aNumber) {
+		info.GetReturnValue().Set(1.75);
+}
+
+NAN_METHOD(anObject) {
+		v8::Local<v8::Object> obj = Nan::New<v8::Object>();
+		Nan::Set(obj, Nan::New("key").ToLocalChecked(), Nan::New("value").ToLocalChecked());
+		info.GetReturnValue().Set(obj);
+}
+
+NAN_METHOD(anArray) {
+		v8::Local<v8::Array> arr = Nan::New<v8::Array>(3);
+		Nan::Set(arr, 0, Nan::New(1));
+		Nan::Set(arr, 1, Nan::New(2));
+		Nan::Set(arr, 2, Nan::New(3));
+
+		info.GetReturnValue().Set(arr);
+}
+
+NAN_METHOD(callback) {
+		v8::Local<v8::Function> callbackHandle = info[0].As<v8::Function>();
+		Nan::MakeCallback(Nan::GetCurrentContext()->Global(), callbackHandle, 0, 0);
+}
+*/
