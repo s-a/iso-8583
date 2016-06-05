@@ -30,8 +30,8 @@ describe('native extension', function() {
 	it('should export a wrapped object', function() {
 		var message = new ISO8583.Message();
 
-		assert.equal(typeof(message.pack), "function");
-		assert.equal(typeof(message.unpack), "function");
+		assert.equal(typeof(message.packSync), "function");
+		assert.equal(typeof(message.unpackSync), "function");
 	});
 });
 
@@ -40,7 +40,7 @@ describe('pack iso8583 message', function() {
 
 		var msg = testMessage.unpacked();
 		var message = new ISO8583.Message();
-		var packedMessage = message.pack(msg);
+		var packedMessage = message.packSync(msg);
 
 		assert.equal(packedMessage.join(" "), testMessage.packed().join(" "));
 	});
@@ -50,7 +50,7 @@ describe('parse and unpack iso8583 message', function() {
 	it('should parse and unpack a message and return an Array of values', function() {
 		var msg = testMessage.packed().join("");
 		var message = new ISO8583.Message();
-		var unpackedMessage = message.parse(msg);
+		var unpackedMessage = message.parseSync(msg);
 
 		assert.deepEqual(unpackedMessage, testMessage.unpacked());
 	});

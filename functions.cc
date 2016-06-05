@@ -18,8 +18,8 @@ NAN_MODULE_INIT(Message::Init) {
 	tpl->SetClassName(Nan::New("Message").ToLocalChecked());
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-	Nan::SetPrototypeMethod(tpl, "pack", pack);
-	Nan::SetPrototypeMethod(tpl, "unpack", unpack);
+	Nan::SetPrototypeMethod(tpl, "packSync", packSync);
+	Nan::SetPrototypeMethod(tpl, "unpackSync", unpackSync);
 	Nan::SetPrototypeMethod(tpl, "test", test);
 
 	constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -62,10 +62,9 @@ v8::Local<v8::Array> stringToHexArray(DL_UINT8 packBuf[1000], DL_UINT16 iNumByte
 	return result;
 };
 
-NAN_METHOD(Message::pack) {
-	Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
 
-
+v8::Local<v8::Array> pack_iso8583(v8::Handle<v8::Array> messageFields){
+	//Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
 	DL_ISO8583_HANDLER isoHandler;
 	DL_ISO8583_MSG     isoMsg;
 	DL_UINT8           packBuf[1000];
@@ -82,8 +81,6 @@ NAN_METHOD(Message::pack) {
 	DL_ISO8583_MSG_Init(NULL, 0, &isoMsg);
 
 	// set ISO message fields
-	if (info[0]->IsArray()) {
-			v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
 			for (unsigned int i = 0; i < messageFields->Length(); i++) {
 				v8::Handle<v8::Array> messageField = v8::Handle<v8::Array>::Cast(messageFields->Get(i));
 
@@ -97,7 +94,6 @@ NAN_METHOD(Message::pack) {
 				//(DL_UINT16 iField, const DL_UINT8 *iDataStr)
 				(void)DL_ISO8583_MSG_SetField_Str( messageFieldPosition, (DL_UINT8 *)c, &isoMsg);
 			}
-	}
 
 
 	// output ISO message content
@@ -113,14 +109,23 @@ NAN_METHOD(Message::pack) {
 	// DL_OUTPUT_Hex(stdout,NULL,packBuf,packedSize);
 
 	v8::Local<v8::Array> result = stringToHexArray(packBuf, packedSize);
-	info.GetReturnValue().Set(result);
+	
+	return result;
+
+}
+
+NAN_METHOD(Message::packSync) {
+	if (info[0]->IsArray()) {
+		v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
+		v8::Local<v8::Array> result = pack_iso8583(messageFields);
+		info.GetReturnValue().Set(result);
+	}
 }
 
 
-v8::Local<v8::Array> DL_ISO8583_MSG_Fetch ( FILE                     *iOutFile,
-					       const char               *_iEolStr,
-					       const DL_ISO8583_HANDLER *iHandler,
-					       const DL_ISO8583_MSG     *iMsg )
+v8::Local<v8::Array> DL_ISO8583_MSG_Fetch (
+	const DL_ISO8583_HANDLER *iHandler,
+	const DL_ISO8583_MSG     *iMsg )
 {
 	DL_UINT16 i;
 
@@ -161,11 +166,10 @@ v8::Local<v8::Array> DL_ISO8583_MSG_Fetch ( FILE                     *iOutFile,
 }
 
 
-NAN_METHOD(Message::unpack) {
+
+v8::Local<v8::Array> unpack_iso8583(v8::Local<v8::Object> bufferObj, unsigned int len){
 	//Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
 
-	v8::Local<v8::Object> bufferObj = info[0]->ToObject();
-	unsigned int len = info[1]->Uint32Value();
 	char * msg = node::Buffer::Data(bufferObj);
 
 	DL_ISO8583_HANDLER isoHandler;
@@ -180,11 +184,17 @@ NAN_METHOD(Message::unpack) {
 	// DL_ISO8583_MSG_Dump(stdout, NULL, &isoHandler, &isoMsg);
 
 
-	v8::Local<v8::Array> result = DL_ISO8583_MSG_Fetch(stdout, NULL, &isoHandler, &isoMsg);
+	v8::Local<v8::Array> result = DL_ISO8583_MSG_Fetch(&isoHandler, &isoMsg);
 	DL_ISO8583_MSG_Free(&isoMsg);
 
-	info.GetReturnValue().Set(result);
+	return result;
+}
 
+NAN_METHOD(Message::unpackSync) {
+	v8::Local<v8::Object> bufferObj = info[0]->ToObject();
+	unsigned int len = info[1]->Uint32Value();
+	v8::Local<v8::Array> result = unpack_iso8583(bufferObj, len);
+	info.GetReturnValue().Set(result);
 }
 
 
