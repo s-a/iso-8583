@@ -46,6 +46,21 @@ describe('pack iso8583 message', function() {
 	});
 });
 
+describe('pack iso8583 message asynchronous', function() {
+	it('should pack message values and return an Array of HEX values', function(done) {
+
+		var msg = testMessage.unpacked();
+		var message = new ISO8583.Message();
+		var callback = function(a,b){
+			// assert.equal(packedMessage.join(" "), testMessage.packed().join(" "));
+			assert.equal(b, 1.75);
+			done();
+		};
+		var packedMessage = message.packAsync(msg, callback);
+		//assert.equal(packedMessage, 1.75);
+	});
+});
+
 describe('parse and unpack iso8583 message', function() {
 	it('should parse and unpack a message and return an Array of values', function() {
 		var msg = testMessage.packed().join("");

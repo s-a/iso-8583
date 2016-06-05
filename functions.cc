@@ -9,42 +9,6 @@ extern "C"{
 }
 
 
-// Wrapper Impl
-
-Nan::Persistent<v8::Function> Message::constructor;
-
-NAN_MODULE_INIT(Message::Init) {
-	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
-	tpl->SetClassName(Nan::New("Message").ToLocalChecked());
-	tpl->InstanceTemplate()->SetInternalFieldCount(1);
-
-	Nan::SetPrototypeMethod(tpl, "packSync", packSync);
-	Nan::SetPrototypeMethod(tpl, "unpackSync", unpackSync);
-	Nan::SetPrototypeMethod(tpl, "test", test);
-
-	constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-	Nan::Set(target, Nan::New("Message").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
-}
-
-Message::Message(double value) : value_(value) {
-}
-
-Message::~Message() {
-}
-
-NAN_METHOD(Message::New) {
-	if (info.IsConstructCall()) {
-		double value = info[0]->IsUndefined() ? 0 : Nan::To<double>(info[0]).FromJust();
-		Message *obj = new Message(value);
-		obj->Wrap(info.This());
-		info.GetReturnValue().Set(info.This());
-	} else {
-		const int argc = 1;
-		v8::Local<v8::Value> argv[argc] = {info[0]};
-		v8::Local<v8::Function> cons = Nan::New(constructor);
-		info.GetReturnValue().Set(cons->NewInstance(argc, argv));
-	}
-}
 
 v8::Local<v8::Array> stringToHexArray(DL_UINT8 packBuf[1000], DL_UINT16 iNumBytes){
 	char const hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B','C','D','E','F'};
@@ -111,25 +75,11 @@ v8::Local<v8::Array> pack_iso8583(v8::Handle<v8::Array> messageFields){
 	v8::Local<v8::Array> result = stringToHexArray(packBuf, packedSize);
 	
 	return result;
-
-}
-
-NAN_METHOD(Message::packSync) {
-	if (info[0]->IsArray()) {
-		v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
-		v8::Local<v8::Array> result = pack_iso8583(messageFields);
-		info.GetReturnValue().Set(result);
-	}
-}
+};
 
 
-v8::Local<v8::Array> DL_ISO8583_MSG_Fetch (
-	const DL_ISO8583_HANDLER *iHandler,
-	const DL_ISO8583_MSG     *iMsg )
-{
+v8::Local<v8::Array> DL_ISO8583_MSG_Fetch (const DL_ISO8583_HANDLER *iHandler, const DL_ISO8583_MSG     *iMsg ){
 	DL_UINT16 i;
-
-
 
 	v8::Local<v8::Array> result = Nan::New<v8::Array>();
 
@@ -189,6 +139,96 @@ v8::Local<v8::Array> unpack_iso8583(v8::Local<v8::Object> bufferObj, unsigned in
 
 	return result;
 }
+
+
+class PackerWorker : public Nan::AsyncWorker {
+ public:
+  PackerWorker(Nan::Callback *callback, v8::Handle<v8::Array> messageFields)
+    : AsyncWorker(callback), messageFields(messageFields) {}
+  ~PackerWorker() {}
+
+  // Executed inside the worker-thread.
+  // It is not safe to access V8, or V8 data structures
+  // here, so everything we need for input and output
+  // should go on `this`.
+  void Execute () {
+	//pack_iso8583(messageFields);
+  }
+
+  // Executed when the async work is complete
+  // this function will be run inside the main event loop
+  // so it is safe to use V8 again
+  void HandleOKCallback () {
+    //Nan::HandleScope scope;
+  	v8::Local<v8::Value> argv[] = { // currently just dummy values 
+  	    Nan::Null()
+  	  , Nan::New<v8::Number>(1.75)
+  	};
+
+    callback->Call(2, argv);
+  }
+
+ private:
+  v8::Handle<v8::Array> messageFields;
+  //v8::Local<v8::Array> result;
+};
+
+
+// Wrapper Impl
+
+Nan::Persistent<v8::Function> Message::constructor;
+
+NAN_MODULE_INIT(Message::Init) {
+	v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+	tpl->SetClassName(Nan::New("Message").ToLocalChecked());
+	tpl->InstanceTemplate()->SetInternalFieldCount(1);
+
+	Nan::SetPrototypeMethod(tpl, "packSync", packSync);
+	Nan::SetPrototypeMethod(tpl, "packAsync", packAsync);
+	Nan::SetPrototypeMethod(tpl, "unpackSync", unpackSync);
+	Nan::SetPrototypeMethod(tpl, "test", test);
+
+	constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+	Nan::Set(target, Nan::New("Message").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+}
+
+Message::Message(double value) : value_(value) {
+}
+
+Message::~Message() {
+}
+
+NAN_METHOD(Message::New) {
+	if (info.IsConstructCall()) {
+		double value = info[0]->IsUndefined() ? 0 : Nan::To<double>(info[0]).FromJust();
+		Message *obj = new Message(value);
+		obj->Wrap(info.This());
+		info.GetReturnValue().Set(info.This());
+	} else {
+		const int argc = 1;
+		v8::Local<v8::Value> argv[argc] = {info[0]};
+		v8::Local<v8::Function> cons = Nan::New(constructor);
+		info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+	}
+}
+
+NAN_METHOD(Message::packSync) {
+	if (info[0]->IsArray()) {
+		v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
+		v8::Local<v8::Array> result = pack_iso8583(messageFields);
+		info.GetReturnValue().Set(result);
+	}
+}
+
+NAN_METHOD(Message::packAsync) {
+	//if (info[0]->IsArray()) {
+		v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
+
+		Nan::Callback *callback = new Nan::Callback(info[1].As<v8::Function>());
+	 	AsyncQueueWorker(new PackerWorker(callback, messageFields));
+	//}
+}
+
 
 NAN_METHOD(Message::unpackSync) {
 	v8::Local<v8::Object> bufferObj = info[0]->ToObject();

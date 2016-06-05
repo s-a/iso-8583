@@ -27,6 +27,7 @@ class Message : public Nan::ObjectWrap {
     static NAN_METHOD(New);
 	/*    static NAN_METHOD(PlusOne);*/
     static NAN_METHOD(packSync);
+    static NAN_METHOD(packAsync);
     static NAN_METHOD(unpackSync);
     static NAN_METHOD(test);
     static Nan::Persistent<v8::Function> constructor;
