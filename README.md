@@ -25,9 +25,11 @@ The main namespace
 ```
 
 ### ISO8583 Message Constructor
-```ISO8583.Message()```
+```javascript
+ISO8583.Message()
+```
 
-### Methods
+### Methods of ISO8583.Message
 
 #### ISO8583.Message().packSync()
 _A native method to pack a message._ 
