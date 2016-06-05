@@ -29,7 +29,7 @@ The main namespace
 
 ### Methods
 
-#### ```ISO8583.Message().packSync()```
+#### ISO8583.Message().packSync()
 _A native method to pack a message._ 
 
 ***Example:***
@@ -57,7 +57,7 @@ _A native method to pack a message._
 ]
 ```
 
-#### ```ISO8583.Message().unpackSync()```
+#### ISO8583.Message().unpackSync()
 _A native method to parse and unpack a message._ 
 
 ***Example:***
@@ -84,7 +84,7 @@ _A native method to parse and unpack a message._
 ]
 ```
 
-#### ```ISO8583.Message().parseSync()```
+#### ISO8583.Message().parseSync()
 _A JavaScript wrapper helper method calling ```unpackSync()```_ 
 
 ***Example:***
