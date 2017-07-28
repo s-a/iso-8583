@@ -125,8 +125,15 @@ v8::Local<v8::Array> unpack_iso8583(v8::Local<v8::Object> bufferObj, unsigned in
 	DL_ISO8583_HANDLER isoHandler;
 	DL_ISO8583_MSG     isoMsg;
 
-	// get ISO-8583 1993 handler
-	DL_ISO8583_DEFS_1993_GetHandler(&isoHandler);
+	if (msg[0] == '1') {
+		// get ISO-8583 1993 handler
+		DL_ISO8583_DEFS_1993_GetHandler(&isoHandler);
+	}
+	else {
+		// get ISO-8583 1987 handler
+		DL_ISO8583_DEFS_1987_GetHandler(&isoHandler);
+	}
+	
 	DL_ISO8583_MSG_Init(NULL,0,&isoMsg);
 
 	(void)DL_ISO8583_MSG_Unpack(&isoHandler, (DL_UINT8 *)msg, len, &isoMsg);
