@@ -5,6 +5,7 @@
 extern "C"{
 		#include "lib/dl_iso8583.h"
 		#include "lib/dl_iso8583_defs_1993.h"
+		#include "lib/dl_iso8583_defs_1987.h"
 		#include "lib/dl_output.h" // for 'DL_OUTPUT_Hex'
 }
 
