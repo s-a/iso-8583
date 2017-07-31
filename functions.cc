@@ -35,31 +35,44 @@ v8::Local<v8::Array> pack_iso8583(v8::Handle<v8::Array> messageFields){
 	DL_UINT8           packBuf[1000];
 	DL_UINT16          packedSize;
 
-	/* get ISO-8583 1993 handler */
-	DL_ISO8583_DEFS_1993_GetHandler(&isoHandler);
+    DL_UINT16 is1987 = 0;
 
 	//
 	// Populate/Pack message
 	//
 
-	// initialise ISO message
+    // initialise ISO message
 	DL_ISO8583_MSG_Init(NULL, 0, &isoMsg);
+    //char     *tmpEOL = (char*)"\n";
+
 
 	// set ISO message fields
-			for (unsigned int i = 0; i < messageFields->Length(); i++) {
-				v8::Handle<v8::Array> messageField = v8::Handle<v8::Array>::Cast(messageFields->Get(i));
+    for (unsigned int i = 0; i < messageFields->Length(); i++) {
+        v8::Handle<v8::Array> messageField = v8::Handle<v8::Array>::Cast(messageFields->Get(i));
 
-				DL_UINT16 messageFieldPosition = (DL_UINT16)messageField->Get(0)->Uint32Value();
+        DL_UINT16 messageFieldPosition = (DL_UINT16)messageField->Get(0)->Uint32Value();
 
-				// convert it to C string
-				v8::String::Utf8Value _messageFieldValue(messageField->Get(1)->ToString());
-				std::string messageFieldValue = std::string(*_messageFieldValue);
-				const char * c = messageFieldValue.c_str();
+        // convert it to C string
+        v8::String::Utf8Value _messageFieldValue(messageField->Get(1)->ToString());
+        std::string messageFieldValue = std::string(*_messageFieldValue);
+        const char * c = messageFieldValue.c_str();
 
-				//(DL_UINT16 iField, const DL_UINT8 *iDataStr)
-				(void)DL_ISO8583_MSG_SetField_Str( messageFieldPosition, (DL_UINT8 *)c, &isoMsg);
-			}
+        if (i == 0 && c[0] != '1') is1987 = 1;
 
+        //(DL_UINT16 iField, const DL_UINT8 *iDataStr)
+        (void)DL_ISO8583_MSG_SetField_Str( messageFieldPosition, (DL_UINT8 *)c, &isoMsg);
+    }
+
+    if (is1987 == 1) {
+        //fprintf(stdout,"%s--------------- 1987 ---------------%s",tmpEOL,tmpEOL);
+        /* get ISO-8583 1987 handler */
+        DL_ISO8583_DEFS_1987_GetHandler(&isoHandler);
+	}
+	else {
+        //fprintf(stdout,"%s--------------- 1993 ---------------%s",tmpEOL,tmpEOL);
+        /* get ISO-8583 1993 handler */
+        DL_ISO8583_DEFS_1993_GetHandler(&isoHandler);
+    }
 
 	// output ISO message content
 	//DL_ISO8583_MSG_Dump(stdout,NULL,&isoHandler,&isoMsg);
@@ -119,19 +132,23 @@ v8::Local<v8::Array> DL_ISO8583_MSG_Fetch (const DL_ISO8583_HANDLER *iHandler, c
 
 
 v8::Local<v8::Array> unpack_iso8583(v8::Local<v8::Object> bufferObj, unsigned int len){
-	//Message* obj = Nan::ObjectWrap::Unwrap<Message>(info.This());
-
-	char * msg = node::Buffer::Data(bufferObj);
+	char *msg = node::Buffer::Data(bufferObj);
 
 	DL_ISO8583_HANDLER isoHandler;
 	DL_ISO8583_MSG     isoMsg;
 
-	if (msg[0] == '1') {
-		// get ISO-8583 1993 handler
+    const char *it = msg;
+
+    //char     *tmpEOL = (char*)"\n";
+
+	if ((*it & 0x10) == 0x10) {
+		// fprintf(stdout,"%s--------------- 1993' ---------------%s",tmpEOL,tmpEOL);
+                // get ISO-8583 1993 handler
 		DL_ISO8583_DEFS_1993_GetHandler(&isoHandler);
 	}
 	else {
-		// get ISO-8583 1987 handler
+	   // fprintf(stdout,"%s--------------- 1987' ---------------%s",tmpEOL,tmpEOL);
+                 // get ISO-8583 1987 handler
 		DL_ISO8583_DEFS_1987_GetHandler(&isoHandler);
 	}
 	
@@ -216,7 +233,8 @@ NAN_METHOD(Message::New) {
 		const int argc = 1;
 		v8::Local<v8::Value> argv[argc] = {info[0]};
 		v8::Local<v8::Function> cons = Nan::New(constructor);
-		info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+		//info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+		info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
 	}
 }
 
