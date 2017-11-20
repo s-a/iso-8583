@@ -689,7 +689,7 @@ static int timestamp_to_struct ( const char *iTimestampStr,
 	DL_MEM_memset(oData,0,sizeof(DL_TIME));
 
 	/* check 'timestamp' format (high-level) */
-	ok = DL_STR_Validate(iTimestampStr,kDL_TIME_TIMESTAMP_LEN,kDL_TIME_TIMESTAMP_LEN,"0123456789");
+	ok = DL_STR_Validate((const DL_CHAR *)iTimestampStr,kDL_TIME_TIMESTAMP_LEN,kDL_TIME_TIMESTAMP_LEN,(const DL_CHAR *)"0123456789");
 
 	/* check that date/time string is within the required range */
     if ( ok && ((DL_STR_StrCmp((const DL_CHAR *)iTimestampStr,(const DL_CHAR *)kTIMESTAMP_MIN_VALUE,0) == -1) ||
