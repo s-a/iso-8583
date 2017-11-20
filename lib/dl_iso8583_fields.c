@@ -447,9 +447,10 @@ DL_ERR _pack_iso_BITMAP ( DL_UINT16                    iField,
 	DL_ERR     err         = kDL_ERR_NONE;
 	DL_UINT8  *tmpPtr      = *ioPtr;
 	DL_UINT16  curFieldIdx = iField;
+	unsigned i;
 
 	/* for each possible bitmap segment */
-	for ( unsigned i=0 ; i<((kDL_ISO8583_MAX_FIELD_IDX-iField+1)+63)/64 ; i++ )
+	for ( i=0 ; i<((kDL_ISO8583_MAX_FIELD_IDX-iField+1)+63)/64 ; i++ )
 	{
 		DL_UINT32 ms=0,
 				  ls=0;
