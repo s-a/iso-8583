@@ -61,7 +61,7 @@ DL_ERR _DL_ISO8583_MSG_AllocField ( DL_UINT16        iField,
 	}
 	else /* dynamic mode */
 	{
-		err = DL_MEM_malloc(iSize+1,&tmpPtr);
+		err = DL_MEM_malloc(iSize+1,(void**)&tmpPtr);
 
 		if ( !err )
 		{

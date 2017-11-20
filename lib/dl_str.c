@@ -45,7 +45,7 @@ static void unescape_string ( DL_CHAR  iEscCh,
 
 DL_CHAR *DL_STR_GetEnv ( const DL_CHAR *iEnvStr )
 {
-    return DL_STR_SafeStr(getenv(iEnvStr));
+    return DL_STR_SafeStr(getenv((const char*)iEnvStr));
 }
 
 /******************************************************************************/
@@ -55,7 +55,7 @@ int DL_STR_StrLen ( const DL_CHAR *iStr )
 	int len = 0;
 
 	if ( iStr != NULL )
-		len = (int)strlen(iStr);
+		len = (int)strlen((const char*)iStr);
 
 	return len;
 }
@@ -171,7 +171,7 @@ void DL_STR_StrCpy ( DL_CHAR       *ioToPtr,
 	else if ( DL_STR_StrLen(iFromPtr) <= iMaxChars ) /* within length */
 	{
 		/* simple string copy */
-		(void)strcpy(ioToPtr,iFromPtr);
+		(void)strcpy((char*)ioToPtr,(const char*)iFromPtr);
 	}
 	else /* too long - so chop */
 	{
@@ -206,7 +206,7 @@ DL_ERR DL_STR_StrNDup ( const DL_CHAR  *iStr,
 	{
 		err = kDL_ERR_OTHER;
 	}
-	else if ( err = DL_MEM_malloc(iMaxChars+1,oStr) )
+	else if ( (err = DL_MEM_malloc(iMaxChars+1,(void**)oStr)) )
 	{
 		/* error - do nothing */
 	}
@@ -240,7 +240,7 @@ DL_ERR DL_STR_StrCat ( const DL_CHAR  *iStr1,
 	str2len = DL_STR_StrLen(iStr2);
 
 	/* allocate memory for combined string */
-	err = DL_MEM_malloc(str1len+str2len+1,oStr);
+	err = DL_MEM_malloc(str1len+str2len+1,(void**)oStr);
 
 	if ( !err )
 	{
@@ -385,7 +385,7 @@ int DL_STR_Validate ( const DL_CHAR *iStr,
 		{
 			/* validate contents */
 			for ( i=0 ; (i<(int)DL_STR_StrLen(iStr)) && ok ; i++ )
-				if ( DL_STR_StrChr(iValidChars,(int)(iStr[i])) == NULL )
+				if ( DL_STR_StrChr((const char*)iValidChars,(int)(iStr[i])) == NULL )
 					ok = 0;
 		}
 	}
@@ -404,7 +404,7 @@ int DL_STR_Contains ( const DL_CHAR *iStr,
 	{
 		while ( *iStr != kDL_ASCII_NULL )
 		{
-			if ( DL_STR_StrChr(iContains,(int)(*iStr)) != NULL )
+			if ( DL_STR_StrChr((const char *)iContains,(int)(*iStr)) != NULL )
 			{
 				ret = 1;
 				break;
@@ -430,7 +430,7 @@ DL_ERR DL_STR_EncapsulateStr ( const DL_CHAR  *iStr,
 	*oStr = NULL;
 
 	/* allocate working buffer (NB (Length(iStr)*2)+2+1 ) */
-	err = DL_MEM_malloc((DL_STR_StrLen(iStr)*2)+2+1,&bufPtr);
+	err = DL_MEM_malloc((DL_STR_StrLen(iStr)*2)+2+1,(void**)&bufPtr);
 
 	if ( !err )
 	{
@@ -579,7 +579,7 @@ DL_CHAR *DL_STR_ReadToBuffer ( const DL_CHAR *iStr,
 	int      charsRead = 0;
 
 	while ( (kDL_ASCII_NULL != *readPtr) &&
-		    (DL_STR_StrChr(iValidChars,(int)(*readPtr)) != NULL) &&
+		    (DL_STR_StrChr((const char*)iValidChars,(int)(*readPtr)) != NULL) &&
 		    (charsRead < iBufferSize) )
 	{
 		*oBuffer = *readPtr;

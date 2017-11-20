@@ -46,7 +46,7 @@ extern DL_CHAR kDL_STR_EmptyStr[1];
 
 /* returns an empty string if the pointer is NULL */
 #define DL_STR_SafeStr(str)\
- ((str)==NULL?kDL_STR_EmptyStr:(str))
+ ( (str)==NULL ? (DL_CHAR*)kDL_STR_EmptyStr : (DL_CHAR*)(str))
 
 /* accepts a pointer to a numeric - outputs safe values (ie 0 if NULL) */
 #define DL_STR_SafeNum(a)\
