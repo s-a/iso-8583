@@ -692,8 +692,8 @@ static int timestamp_to_struct ( const char *iTimestampStr,
 	ok = DL_STR_Validate(iTimestampStr,kDL_TIME_TIMESTAMP_LEN,kDL_TIME_TIMESTAMP_LEN,"0123456789");
 
 	/* check that date/time string is within the required range */
-    if ( ok && ((DL_STR_StrCmp(iTimestampStr,kTIMESTAMP_MIN_VALUE,0) == -1) ||
-                (DL_STR_StrCmp(iTimestampStr,kTIMESTAMP_MAX_VALUE,0) ==  1)) )
+    if ( ok && ((DL_STR_StrCmp((const DL_CHAR *)iTimestampStr,(const DL_CHAR *)kTIMESTAMP_MIN_VALUE,0) == -1) ||
+                (DL_STR_StrCmp((const DL_CHAR *)iTimestampStr,(const DL_CHAR *)kTIMESTAMP_MAX_VALUE,0) ==  1)) )
 	{
 		ok = 0;
 	}
