@@ -2,6 +2,7 @@
     "targets": [
         {
             "target_name": "ISO8583",
+            "cflags_cc!": [ "-std=c++11" ],
             "sources": [ 
             	"NativeExtension.cc", "functions.cc", 
             	"lib/dl_iso8583.c",

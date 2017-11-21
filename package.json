@@ -1,6 +1,6 @@
 {
   "name": "iso-8583",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Packing and unpacking ISO 8583 messages",
   "main": "index.js",
   "directories": {
