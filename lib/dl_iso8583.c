@@ -285,8 +285,6 @@ void DL_ISO8583_MSG_Dump ( FILE                     *iOutFile,
 	{
 		if ( NULL != iMsg->field[i].ptr ) /* present */
 		{
-			DL_ISO8583_FIELD_DEF *fieldDef = DL_ISO8583_GetFieldDef(i,iHandler);
-
 			fprintf(iOutFile,"[%03d] ",
 					(int)i);
 			fprintf(iOutFile,"%s%s",iMsg->field[i].ptr,tmpEOL);

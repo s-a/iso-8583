@@ -244,7 +244,7 @@ DL_ERR _unpack_iso_ASCHEX ( DL_UINT16                    iField,
 	DL_UINT8  *tmpDataPtr = NULL;
 
 	/* variable length handling */
-	err = VarLen_Get(&tmpPtr,iFieldDefPtr->varLen,iFieldDefPtr->len,&size);
+	err = VarLen_Get((const DL_UINT8 **)&tmpPtr,iFieldDefPtr->varLen,iFieldDefPtr->len,&size);
 
 	/* allocate field */
 	if ( !err )
@@ -339,7 +339,7 @@ DL_ERR _unpack_iso_ASCII ( DL_UINT16                    iField,
 	DL_UINT8  *tmpDataPtr = NULL;
 
 	/* variable length handling */
-	err = VarLen_Get(&tmpPtr,iFieldDefPtr->varLen,iFieldDefPtr->len,&size);
+	err = VarLen_Get((const DL_UINT8 **)&tmpPtr,iFieldDefPtr->varLen,iFieldDefPtr->len,&size);
 
 	/* allocate field */
 	if ( !err )
@@ -417,7 +417,7 @@ DL_ERR _unpack_iso_BINARY ( DL_UINT16                    iField,
 	DL_UINT8  *tmpDataPtr = NULL;
 
 	/* variable length handling */
-	err = VarLen_Get(&tmpPtr,iFieldDefPtr->varLen,iFieldDefPtr->len,&size);
+	err = VarLen_Get((const DL_UINT8 **)&tmpPtr,iFieldDefPtr->varLen,iFieldDefPtr->len,&size);
 
 	/* allocate field */
 	if ( !err )
@@ -447,7 +447,7 @@ DL_ERR _pack_iso_BITMAP ( DL_UINT16                    iField,
 	DL_ERR     err         = kDL_ERR_NONE;
 	DL_UINT8  *tmpPtr      = *ioPtr;
 	DL_UINT16  curFieldIdx = iField;
-	int        i;
+	unsigned i;
 
 	/* for each possible bitmap segment */
 	for ( i=0 ; i<((kDL_ISO8583_MAX_FIELD_IDX-iField+1)+63)/64 ; i++ )

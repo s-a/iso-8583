@@ -335,7 +335,7 @@ void DL_TIME_ConvUTCSecondsToLocalFormatStr ( DL_UINT32  iUtcSecs,
 	DL_TIME st;
 
 	/* init outputs */
-	sprintf(ioFormatStr,"");
+	ioFormatStr[0] = 0;
 
 	/* convert UTC seconds to Local structure */
 	DL_TIME_ConvUTCSecondsToLocalStruct(iUtcSecs,&st);
@@ -689,11 +689,11 @@ static int timestamp_to_struct ( const char *iTimestampStr,
 	DL_MEM_memset(oData,0,sizeof(DL_TIME));
 
 	/* check 'timestamp' format (high-level) */
-	ok = DL_STR_Validate(iTimestampStr,kDL_TIME_TIMESTAMP_LEN,kDL_TIME_TIMESTAMP_LEN,"0123456789");
+	ok = DL_STR_Validate((const DL_CHAR *)iTimestampStr,kDL_TIME_TIMESTAMP_LEN,kDL_TIME_TIMESTAMP_LEN,(const DL_CHAR *)"0123456789");
 
 	/* check that date/time string is within the required range */
-    if ( ok && ((DL_STR_StrCmp(iTimestampStr,kTIMESTAMP_MIN_VALUE,0) == -1) ||
-                (DL_STR_StrCmp(iTimestampStr,kTIMESTAMP_MAX_VALUE,0) ==  1)) )
+    if ( ok && ((DL_STR_StrCmp((const DL_CHAR *)iTimestampStr,(const DL_CHAR *)kTIMESTAMP_MIN_VALUE,0) == -1) ||
+                (DL_STR_StrCmp((const DL_CHAR *)iTimestampStr,(const DL_CHAR *)kTIMESTAMP_MAX_VALUE,0) ==  1)) )
 	{
 		ok = 0;
 	}
