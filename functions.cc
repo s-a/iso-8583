@@ -48,19 +48,35 @@ v8::Local<v8::Array> pack_iso8583(v8::Handle<v8::Array> messageFields){
 
 	// set ISO message fields
     for (unsigned int i = 0; i < messageFields->Length(); i++) {
-        v8::Handle<v8::Array> messageField = v8::Handle<v8::Array>::Cast(messageFields->Get(i));
+    	v8::Local<v8::Context> context = Nan::GetCurrentContext();
 
-        DL_UINT16 messageFieldPosition = (DL_UINT16)messageField->Get(0)->Uint32Value();
+    	v8::Isolate* isolate = context->GetIsolate();
+    	v8::HandleScope handle_scope(isolate);
+
+    	v8::Local<v8::Value> maybeValue = messageFields->Get(context, i).ToLocalChecked();
+    	if (maybeValue->IsArray()) {
+    		v8::Local<v8::Array> messageField = v8::Local<v8::Array>::Cast(maybeValue);
+
+    	v8::Local<v8::Value> value0 = messageField->Get(context, 0).ToLocalChecked();
+    	DL_UINT16 messageFieldPosition = static_cast<DL_UINT16>(value0->Uint32Value(context).FromJust());
 
         // convert it to C string
-        v8::String::Utf8Value _messageFieldValue(messageField->Get(1)->ToString());
+    	v8::Local<v8::Value> value = messageField->Get(context, 1).ToLocalChecked();
+    	v8::Local<v8::String> stringValue = value->ToString(context).ToLocalChecked();
+    	v8::String::Utf8Value _messageFieldValue(isolate, stringValue);
+
         std::string messageFieldValue = std::string(*_messageFieldValue);
         const char * c = messageFieldValue.c_str();
 
         if (i == 0 && c[0] != '1') is1987 = 1;
 
-        //(DL_UINT16 iField, const DL_UINT8 *iDataStr)
         (void)DL_ISO8583_MSG_SetField_Str( messageFieldPosition, (DL_UINT8 *)c, &isoMsg);
+
+    	} else {
+          // what should happen here?
+    	}
+
+
     }
 
     if (is1987 == 1) {
@@ -257,8 +273,9 @@ NAN_METHOD(Message::packAsync) {
 
 
 NAN_METHOD(Message::unpackSync) {
-	v8::Local<v8::Object> bufferObj = info[0]->ToObject();
-	unsigned int len = info[1]->Uint32Value();
+	v8::Local<v8::Context> context = Nan::GetCurrentContext();
+	v8::Local<v8::Object> bufferObj = info[0]->ToObject(context).ToLocalChecked();
+	unsigned int len = info[1]->Uint32Value(context).FromJust();
 	v8::Local<v8::Array> result = unpack_iso8583(bufferObj, len);
 	info.GetReturnValue().Set(result);
 }
@@ -271,8 +288,12 @@ NAN_METHOD(Message::test) {
 
 	if (info[0]->IsArray()) {
 			v8::Handle<v8::Array> messageFields = v8::Handle<v8::Array>::Cast(info[0]);
+		v8::Local<v8::Context> context = Nan::GetCurrentContext();
+
 			for (unsigned int i = 0; i < messageFields->Length(); i++) {
-				Nan::Set(result, i, messageFields->Get(i));
+				v8::Local<v8::Context> context = Nan::GetCurrentContext();
+				v8::Local<v8::Value> value = messageFields->Get(context, i).ToLocalChecked();
+				Nan::Set(result, i, value);
 			}
 	}
 
